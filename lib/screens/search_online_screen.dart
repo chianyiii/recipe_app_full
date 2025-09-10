@@ -50,14 +50,25 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
     return 0;
   }
 
+  /// Search online recipes and fetch full details for each result
   Future<void> _search() async {
     if (_controller.text.trim().isEmpty) return;
     setState(() => _loading = true);
 
     try {
-      final data =
+      final searchData =
       await _service.searchRecipes(_controller.text.trim(), number: 10);
-      setState(() => _results = data);
+
+      // Fetch full recipe details for each search result
+      List<Map<String, dynamic>> fullResults = [];
+      for (var r in searchData) {
+        if (r['id'] != null) {
+          final fullRecipe = await _service.getRecipeInfo(r['id']);
+          fullResults.add(fullRecipe);
+        }
+      }
+
+      setState(() => _results = fullResults);
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -65,6 +76,7 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
       setState(() => _loading = false);
     }
   }
+
 
   Future<void> _saveRecipe(Map<String, dynamic> info) async {
     try {
@@ -111,7 +123,6 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
         },
       );
 
-      // If user cancels, do nothing
       if (selectedTypeId == null) return;
 
       // Create Recipe object
@@ -123,7 +134,7 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
             ?.map((e) => e['original'] ?? '')
             .join('\n') ??
             '',
-        steps: info['instructions'] ?? '',
+        steps: info['instructions'] ?? 'No steps provided.',
       );
 
       // Save to local DB
@@ -150,13 +161,10 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
     }
   }
 
-
-
   Widget _buildRecipeCard(Map<String, dynamic> recipe) {
     final image = recipe['image'] ?? '';
     return GestureDetector(
       onTap: () {
-        // Open detail screen for online recipe
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -172,7 +180,8 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(12)),
                 child: image.startsWith('http')
                     ? Image.network(image, fit: BoxFit.cover)
                     : const Icon(Icons.fastfood, size: 40),
@@ -190,7 +199,6 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
             IconButton(
               icon: const Icon(Icons.download),
               onPressed: () async {
-                // Call the _saveRecipe function with category selection
                 await _saveRecipe(recipe);
               },
             ),
@@ -199,7 +207,6 @@ class _SearchOnlineScreenState extends State<SearchOnlineScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
