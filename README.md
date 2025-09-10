@@ -24,11 +24,13 @@ A Flutter-based recipe management application that allows users to browse, creat
 ```bash
 git clone <your-repo-url>
 cd recipe_app
+```
 
 2. **Install dependencies:**
 
 ```bash
 flutter pub get
+```
 
 3. **Run the app**
 
