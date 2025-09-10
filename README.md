@@ -69,13 +69,13 @@ flutter run
 
 ## Technical Details
 
-Framework: Flutter
-Language: Dart
-Local Storage: SQLite (sqflite)
-State Management: Provider
-Networking: HTTP requests to Spoonacular API
-Password Security: SHA-256 hashing with static salt
-Reactive Programming: ChangeNotifier with Provider
+- Framework: Flutter
+- Language: Dart
+- Local Storage: SQLite (sqflite)
+- State Management: Provider
+- Networking: HTTP requests to Spoonacular API
+- Password Security: SHA-256 hashing with static salt
+- Reactive Programming: ChangeNotifier with Provider
 
 
 ---
