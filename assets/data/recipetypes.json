@@ -1,0 +1,56 @@
+{
+  "types": [
+    {"id": 0, "name": "All"},
+    {"id": 1, "name": "Appetizer"},
+    {"id": 2, "name": "Rice"},
+    {"id": 3, "name": "Noodle"},
+    {"id": 4, "name": "Desserts"},
+    {"id": 5, "name": "Beverages"},
+    {"id": 6, "name": "Breads"},
+    {"id": 7, "name": "Vegetarian"},
+    {"id": 8, "name": "Gluten Free"},
+    {"id": 9, "name": "Dairy Free"}
+  ],
+  "recipes": [
+    {
+      "id": 1,
+      "name": "Classic Fried Rice",
+      "typeId": 2,
+      "imagePath": "",
+      "ingredients": "2 cups cooked rice\n1 tbsp oil\n1 egg\n1/2 cup peas\n2 cloves garlic, minced\nSalt & pepper to taste",
+      "steps": "Heat oil in a pan.\nAdd garlic and stir until fragrant.\nAdd peas and cook 2 min.\nPush veggies aside, scramble the egg.\nAdd rice, stir well.\nSeason with salt & pepper.\nServe hot."
+    },
+    {
+      "id": 2,
+      "name": "Chocolate Brownies",
+      "typeId": 4,
+      "imagePath": "",
+      "ingredients": "200g dark chocolate\n150g butter\n200g sugar\n3 eggs\n100g flour",
+      "steps": "Preheat oven to 180°C.\nMelt chocolate and butter together.\nWhisk in sugar and eggs.\nFold in flour.\nPour into baking pan.\nBake 25-30 minutes."
+    },
+    {
+      "id": 3,
+      "name": "Mango Smoothie",
+      "typeId": 5,
+      "imagePath": "",
+      "ingredients": "1 cup mango chunks\n1/2 cup yogurt\n1/2 cup milk\n1 tsp honey",
+      "steps": "Combine all ingredients in a blender.\nBlend until smooth.\nPour into a glass and serve."
+    },
+    {
+      "id": 4,
+      "name": "Garlic Bread",
+      "typeId": 6,
+      "imagePath": "",
+      "ingredients": "1 baguette\n100g butter\n3 cloves garlic, minced\n1 tsp parsley",
+      "steps": "Preheat oven to 200°C.\nMix butter, garlic, parsley.\nSlice baguette and spread butter mixture.\nBake 10-12 minutes until golden."
+    },
+    {
+      "id": 5,
+      "name": "Vegetable Stir Fry",
+      "typeId": 7,
+      "imagePath": "",
+      "ingredients": "1 cup broccoli\n1 cup carrots\n1 bell pepper\n2 tbsp soy sauce\n1 tbsp olive oil\n2 cloves garlic, minced",
+      "steps": "Heat oil in a wok.\nAdd garlic and stir for 30 seconds.\nAdd vegetables and stir fry 5-7 min.\nAdd soy sauce and mix well.\nServe hot with rice or noodles."
+    }
+  ]
+}
