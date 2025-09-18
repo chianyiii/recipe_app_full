@@ -27,20 +27,23 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
   Widget _buildImage(String imagePath) {
     if (imagePath.startsWith('http')) {
+      // Online image
       return Image.network(
         imagePath,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
             Container(color: Colors.grey[200], child: const Icon(Icons.broken_image)),
       );
-    } else if (imagePath.isNotEmpty && File(imagePath).existsSync()) {
-      return Image.file(
-        File(imagePath),
+    } else if (imagePath.isNotEmpty) {
+      // Asset image
+      return Image.asset(
+        '../../assets/images/$imagePath',
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
             Container(color: Colors.grey[200], child: const Icon(Icons.broken_image)),
       );
     } else {
+      // No image
       return Container(
         color: Colors.grey[200],
         child: const Icon(Icons.image, size: 40),
@@ -75,7 +78,6 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
         const SnackBar(content: Text('Logged out successfully')),
       );
 
-      // Navigate to login screen and remove all previous routes
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -135,7 +137,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
                 itemCount: recipes.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
@@ -148,7 +151,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => RecipeDetailScreen(recipe: recipe),
+                          builder: (_) =>
+                              RecipeDetailScreen(recipe: recipe),
                         ),
                       );
                     },

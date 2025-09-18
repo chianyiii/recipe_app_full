@@ -22,7 +22,11 @@ class AppDatabase {
   Future<Database> _initDB(String filePath) async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     final dbPath = join(documentsDirectory.path, filePath);
-    return await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      dbPath,
+      version: 1,
+      onCreate: _createDB,
+    );
   }
 
   Future _createDB(Database db, int version) async {
@@ -53,20 +57,14 @@ class AppDatabase {
     );
     ''');
 
-    // load recipetypes.json from assets and populate
-    String jsonStr = await rootBundle.loadString('assets/data/recipetypes.json');
-    final List types = json.decode(jsonStr);
-    final batch = db.batch();
-    for (var t in types) {
-      batch.insert('recipetypes', {'id': t['id'], 'name': t['name']});
-    }
-    await batch.commit(noResult: true);
+    // Load recipe types asynchronously (doesn't block register/login)
+    _loadAndInsertRecipeTypes(db);
 
-    // sample recipes
+    // Insert a couple of sample recipes immediately
     await db.insert('recipes', {
       'name': 'Simple Pancakes',
       'typeId': 3,
-      'imagePath': '',
+      'imagePath': 'pancakes.jpg',
       'ingredients': '2 cups flour\n1.5 cups milk\n2 eggs\n2 tbsp sugar\n2 tsp baking powder',
       'steps': 'Mix dry ingredients\nAdd wet ingredients and stir\nPour batter onto hot pan\nFlip when bubbles form\nServe warm'
     });
@@ -74,13 +72,30 @@ class AppDatabase {
     await db.insert('recipes', {
       'name': 'Chicken Noodle Soup',
       'typeId': 2,
-      'imagePath': '',
+      'imagePath': 'chicken_noodle.jpg',
       'ingredients': '1 whole chicken\n200g egg noodles\n2 carrots\n2 celery stalks\n1 onion\nSalt\nPepper',
       'steps': 'Boil chicken to make stock\nAdd chopped vegetables\nAdd noodles and cook\nSeason to taste\nServe hot'
     });
+
   }
 
-  // user methods
+  /// Load recipe types JSON in background
+  Future<void> _loadAndInsertRecipeTypes(Database db) async {
+    try {
+      String jsonStr = await rootBundle.loadString('assets/data/recipetypes.json');
+      final List types = json.decode(jsonStr);
+      final batch = db.batch();
+      for (var t in types) {
+        batch.insert('recipetypes', {'id': t['id'], 'name': t['name']});
+      }
+      await batch.commit(noResult: true);
+      print('Recipe types inserted successfully.');
+    } catch (e) {
+      print('Error loading recipe types: $e');
+    }
+  }
+
+  // ---------- USER ----------
   Future<int> createUser(User user) async {
     final db = await instance.database;
     return await db.insert('users', user.toMap());
@@ -88,19 +103,24 @@ class AppDatabase {
 
   Future<User?> getUserByUsername(String username) async {
     final db = await instance.database;
-    final res = await db.query('users', where: 'username = ?', whereArgs: [username], limit: 1);
+    final res = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+      limit: 1,
+    );
     if (res.isNotEmpty) return User.fromMap(res.first);
     return null;
   }
 
-  // recipetypes
+  // ---------- RECIPETYPES ----------
   Future<List<RecipeType>> getAllRecipeTypes() async {
     final db = await instance.database;
     final res = await db.query('recipetypes', orderBy: 'id');
     return res.map((r) => RecipeType(id: r['id'] as int, name: r['name'] as String)).toList();
   }
 
-  // recipes CRUD
+  // ---------- RECIPES ----------
   Future<int> insertRecipe(Recipe recipe) async {
     final db = await instance.database;
     return await db.insert('recipes', recipe.toMap());
@@ -110,7 +130,8 @@ class AppDatabase {
     final db = await instance.database;
     List<Map<String, dynamic>> res;
     if (typeId != null) {
-      res = await db.query('recipes', where: 'typeId = ?', whereArgs: [typeId], orderBy: 'name');
+      res = await db.query('recipes',
+          where: 'typeId = ?', whereArgs: [typeId], orderBy: 'name');
     } else {
       res = await db.query('recipes', orderBy: 'name');
     }
@@ -126,7 +147,8 @@ class AppDatabase {
 
   Future<int> updateRecipe(Recipe recipe) async {
     final db = await instance.database;
-    return await db.update('recipes', recipe.toMap(), where: 'id = ?', whereArgs: [recipe.id]);
+    return await db.update('recipes', recipe.toMap(),
+        where: 'id = ?', whereArgs: [recipe.id]);
   }
 
   Future<int> deleteRecipe(int id) async {

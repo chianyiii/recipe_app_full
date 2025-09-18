@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
+import 'recipe_list_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -73,9 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           obscureText: true,
                           onSaved: (v) => _password = v ?? '',
-                          validator: (v) => v == null || v.length < 4
-                              ? 'Minimum 4 characters'
-                              : null,
+                          validator: (v) =>
+                          v == null || v.length < 4 ? 'Minimum 4 characters' : null,
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
@@ -96,7 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               final ok = await auth.login(_username, _password);
                               setState(() => _loading = false);
                               if (ok) {
-                                Navigator.pushReplacementNamed(context, '/recipes');
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const RecipeListScreen(),
+                                  ),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('Login failed')));
@@ -117,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => RegisterScreen())),
+                                  builder: (_) => const RegisterScreen())),
                           child: const Text('Register'),
                         ),
                       ],

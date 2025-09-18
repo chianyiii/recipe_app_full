@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'recipe_list_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
@@ -26,45 +29,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
 
-    try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      final success = await auth.register(
-        _usernameCtrl.text.trim(),
-        _passwordCtrl.text,
-      );
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final success = await auth.register(
+      _usernameCtrl.text.trim(),
+      _passwordCtrl.text,
+    );
 
-      if (success) {
-        if (mounted) Navigator.pushReplacementNamed(context, '/recipes');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration failed — username already taken')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+    setState(() => _loading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Registration successful!')));
+
+      // Use pushReplacement with MaterialPageRoute to stay inside Provider tree
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const RecipeListScreen(),
+        ),
       );
-    } finally {
-      setState(() => _loading = false);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Username already exists')));
     }
-  }
-
-  String? _validateUsername(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Enter a username';
-    if (value.trim().length < 4) return 'Minimum 4 characters';
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Enter password';
-    if (value.length < 6) return 'Minimum 6 characters';
-    // Optional: Add regex for stronger password
-    return null;
-  }
-
-  String? _validateConfirm(String? value) {
-    if (value != _passwordCtrl.text) return 'Passwords do not match';
-    return null;
   }
 
   @override
@@ -72,30 +59,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Register')),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             children: [
               TextFormField(
                 controller: _usernameCtrl,
                 decoration: const InputDecoration(labelText: 'Username'),
-                validator: _validateUsername,
+                validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Enter username' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordCtrl,
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
-                validator: _validatePassword,
+                validator: (v) =>
+                v == null || v.length < 6 ? 'Minimum 6 characters' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _confirmCtrl,
                 decoration: const InputDecoration(labelText: 'Confirm Password'),
                 obscureText: true,
-                validator: _validateConfirm,
+                validator: (v) =>
+                v != _passwordCtrl.text ? 'Passwords do not match' : null,
               ),
               const SizedBox(height: 24),
               SizedBox(

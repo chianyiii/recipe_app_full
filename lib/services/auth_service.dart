@@ -14,17 +14,29 @@ class AuthService {
   }
 
   Future<bool> register(String username, String password) async {
+    print("Starting register for $username...");
     final existing = await _db.getUserByUsername(username);
-    if (existing != null) return false;
+    if (existing != null) {
+      print("Username already exists.");
+      return false;
+    }
+
     final hash = hashPassword(password);
     final user = User(username: username, passwordHash: hash);
     await _db.createUser(user);
+    print("User $username created.");
     return true;
   }
 
   Future<bool> login(String username, String password) async {
+    print("Attempting login for $username...");
     final user = await _db.getUserByUsername(username);
-    if (user == null) return false;
-    return user.passwordHash == hashPassword(password);
+    if (user == null) {
+      print("User not found.");
+      return false;
+    }
+    final valid = user.passwordHash == hashPassword(password);
+    print(valid ? "Login success." : "Invalid password.");
+    return valid;
   }
 }
